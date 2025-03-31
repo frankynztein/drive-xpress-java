@@ -1,158 +1,227 @@
+-- Eliminar tablas existentes en orden correcto
+--DROP TABLE IF EXISTS car_features;
+--DROP TABLE IF EXISTS car_categories;
+--DROP TABLE IF EXISTS rental;
+--DROP TABLE IF EXISTS car_photo_gallery;
+--DROP TABLE IF EXISTS car;
+--DROP TABLE IF EXISTS feature;
+--DROP TABLE IF EXISTS category;
+--DROP TABLE IF EXISTS users;
+
+-- Tabla USERS
+CREATE TABLE users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT chk_email CHECK (email LIKE '%@%.%')
+);
+
+-- Tabla CATEGORY
+CREATE TABLE category (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    image_url VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla FEATURE
+CREATE TABLE feature (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    icon VARCHAR(255) NOT NULL,
+    description VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Tabla CAR
-CREATE TABLE CAR (
+CREATE TABLE car (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     model VARCHAR(255) NOT NULL,
-    category VARCHAR(255),
-    transmission VARCHAR(255),
-    daily_rental_cost DECIMAL(10, 2),
+    transmission VARCHAR(50) NOT NULL CHECK (transmission IN ('Manual', 'Automático')),
+    daily_rental_cost DECIMAL(10,2) NOT NULL CHECK (daily_rental_cost > 0),
     description VARCHAR(1000),
-    main_photo_url VARCHAR(255)
+    main_photo_url VARCHAR(255) NOT NULL,
+    is_available BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Tabla CAR_PHOTO_GALLERY
-CREATE TABLE CAR_PHOTO_GALLERY (
+CREATE TABLE car_photo_gallery (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    car_id BIGINT,
-    photo_gallery VARCHAR(255),
-    FOREIGN KEY (car_id) REFERENCES CAR(id)
+    car_id BIGINT NOT NULL,
+    photo_url VARCHAR(255) NOT NULL,
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (car_id) REFERENCES car(id) ON DELETE CASCADE
 );
 
--- Datos en la tabla CAR
-INSERT INTO CAR (model, category, transmission, daily_rental_cost, description, main_photo_url)
-VALUES
-(
-    'Peugeot 208',
-    'Sedán',
-    'Manual',
-    85,
-    'El Peugeot 208 es un sedán versátil con diseño moderno y tecnología avanzada. Ofrece un interior cómodo, motor eficiente y gran maniobrabilidad. Su sistema de seguridad y conectividad lo hacen ideal para viajes urbanos y largos. Un coche confiable con excelente relación calidad-precio.', 'peugeot-208.png'
-),
-(
-    'Peugeot 308',
-    'Compacto',
-    'Automático',
-    110,
-    'El Peugeot 308 combina diseño elegante con tecnología de vanguardia. Su conducción es precisa y eficiente, gracias a su motorización optimizada. Dispone de un habitáculo espacioso y bien equipado. Ideal para quienes buscan un coche compacto sin renunciar al confort y la seguridad avanzada.', 'peugeot-308.png'
-),
-(
-    'Peugeot 2008',
-    'SUV',
-    'Manual',
-    95,
-    'El Peugeot 2008 es un SUV urbano con un diseño robusto y dinámico. Su habitáculo es espacioso y cuenta con tecnología avanzada. Equipado con sistemas de seguridad y asistencia, ofrece una conducción cómoda y segura. Ideal para quienes buscan un vehículo versátil y moderno.', 'peugeot-2008.png'
-),
-(
-    'Audi A1 Sportback',
-    'Compacto',
-    'Manual',
-    100,
-    'El Audi A1 Sportback es un compacto premium con un diseño juvenil y deportivo. Ofrece un interior de alta calidad, tecnología avanzada y motores eficientes. Su conducción es ágil y segura, ideal para la ciudad. Destaca por su conectividad y sistemas de asistencia innovadores.', 'audi-a1-sportback.png'
-),
-(
-    'Peugeot Rifter',
-    'SUV',
-    'Manual',
-    90,
-    'El Peugeot Rifter es un SUV espacioso y funcional, ideal para familias y aventureros. Su diseño robusto y su equipamiento tecnológico garantizan comodidad y seguridad. Ofrece gran capacidad de carga y versatilidad en el uso diario, con motores eficientes y asistencias avanzadas.', 'peugeot-rifter.png'
-),
-(
-    'Peugeot 3008',
-    'SUV',
-    'Automático',
-    130,
-    'El Peugeot 3008 es un SUV sofisticado con un diseño innovador. Su interior tecnológico y espacioso ofrece confort y conectividad avanzada. Conducción ágil y eficiente con asistencia inteligente. Un vehículo que combina estilo, seguridad y rendimiento para experiencias de viaje inolvidables.', 'peugeot-3008.png'
-),
-(
-    'Peugeot 408',
-    'Sedán',
-    'Automático',
-    125,
-    'El Peugeot 408 destaca por su diseño aerodinámico y elegante. Su interior amplio y tecnología avanzada lo convierten en un sedán de alto nivel. Con motores eficientes y sistemas de seguridad avanzados, es ideal para quienes buscan confort, dinamismo y eficiencia en la conducción.', 'peugeot-408.png'
-),
-(
-    'BMW Serie 1',
-    'Sedán',
-    'Automático',
-    120,
-    'El BMW Serie 1 es un sedán premium con un diseño sofisticado y deportivo. Su motor potente y eficiente ofrece una experiencia de conducción dinámica. Cuenta con un interior refinado, tecnología de vanguardia y avanzados sistemas de seguridad. Ideal para quienes buscan confort, rendimiento y exclusividad.', 'bmw-serie-1.png'
-),
-(
-    'Peugeot 308 SW',
-    'Familiar',
-    'Automático',
-    105,
-    'El Peugeot 308 SW es un familiar espacioso con un diseño moderno y funcional. Ofrece tecnología avanzada, eficiencia en el consumo y un maletero amplio. Ideal para viajes largos con la familia, gracias a su comodidad, seguridad y conectividad inteligente.', 'peugeot-308-sw.png'
-),
-(
-    'Mini Countryman',
-    'SUV',
-    'Automático',
-    140,
-    'El Mini Countryman es un SUV compacto con un diseño icónico y detalles premium. Su conducción es ágil y divertida, con tecnología avanzada y seguridad optimizada. Espacioso y versátil, es perfecto para la ciudad y escapadas al aire libre, combinando estilo y funcionalidad.', 'mini-countryman.png'
-),
-(
-    'BMW X1',
-    'SUV',
-    'Automático',
-    135,
-    'El BMW X1 es un SUV premium con un diseño robusto y sofisticado. Ofrece una conducción dinámica con motores eficientes y tecnología avanzada. Su interior es espacioso y cómodo, con sistemas de asistencia inteligentes. Un coche ideal para quienes buscan rendimiento y exclusividad.', 'bmw-x1.png'
-),
-(
-    'BMW Serie 3',
-    'Sedán',
-    'Automático',
-    150,
-    'El BMW Serie 3 es un sedán de alto rendimiento con un diseño elegante y deportivo. Destaca por su tecnología avanzada, confort premium y motores potentes. Conducción precisa y seguridad de vanguardia lo convierten en una opción ideal para quienes buscan sofisticación y dinamismo.', 'bmw-serie-3.png'
-),
-(
-    'BMW Serie 3 Touring',
-    'Familiar',
-    'Automático',
-    145,
-    'El BMW Serie 3 Touring combina deportividad con funcionalidad. Su diseño elegante y su amplio espacio interior lo hacen ideal para viajes en familia. Con tecnología de última generación y motores eficientes, ofrece confort, seguridad y una conducción excepcional en cualquier trayecto.', 'bmw-serie-3-touring.png'
-),
-(
-    'Peugeot Rifter',
-    'SUV',
-    'Automático',
-    100,
-    'El Peugeot Rifter es un SUV práctico y espacioso, diseñado para la comodidad y la aventura. Ofrece un interior versátil, tecnología avanzada y seguridad optimizada. Su conducción es ágil y eficiente, con un diseño robusto ideal para la vida urbana y los viajes largos.', 'peugeot-rifter.png'
-),
-(
-    'Audi A5 Sportback',
-    'Coupé',
-    'Automático',
-    145,
-    'El Audi A5 Sportback es un coupé elegante con un diseño aerodinámico y refinado. Su interior premium y tecnología avanzada garantizan una experiencia de conducción excepcional. Con un motor potente y eficiente, ofrece seguridad y dinamismo para quienes buscan exclusividad y confort.', 'audi-a5-sportback.png'
-),
-(
-    'Audi Q5',
-    'SUV',
-    'Automático',
-    135,
-    'El Audi Q5 es un SUV premium con un diseño sofisticado y tecnología de vanguardia. Su interior espacioso y cómodo ofrece una experiencia de lujo. Conducción ágil y segura con asistencia avanzada, ideal para la ciudad y carretera. Eficiencia y rendimiento en cada detalle.', 'audi-q5.png'
-),
-(
-    'VW Caravelle',
-    'SUV',
-    'Automático',
-    110,
-    'La VW Caravelle es un SUV funcional y espacioso, diseñado para el confort y la versatilidad. Ideal para familias o viajes largos, ofrece tecnología avanzada y seguridad optimizada. Su motor eficiente y conducción estable garantizan una experiencia placentera en cualquier trayecto.', 'vw-caravelle.png'
-),
-(
-    'BMW X5',
-    'SUV',
-    'Automático',
-    150,
-    'El BMW X5 es un SUV de lujo con un diseño imponente y tecnología de última generación. Su motor potente y eficiencia avanzada ofrecen una conducción premium. Espacioso, cómodo y seguro, es perfecto para quienes buscan rendimiento, exclusividad y una experiencia de manejo excepcional.', 'bmw-x5.png'
+-- Tablas car_features
+CREATE TABLE car_features (
+    car_id BIGINT NOT NULL,
+    feature_id BIGINT NOT NULL,
+    PRIMARY KEY (car_id, feature_id),
+    FOREIGN KEY (car_id) REFERENCES car(id) ON DELETE CASCADE,
+    FOREIGN KEY (feature_id) REFERENCES feature(id) ON DELETE CASCADE
 );
 
--- Datos en la tabla CAR_PHOTO_GALLERY
-INSERT INTO CAR_PHOTO_GALLERY (car_id, photo_gallery)
-VALUES (1, 'audi-q5.png');
+CREATE TABLE car_categories (
+    car_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL,
+    PRIMARY KEY (car_id, category_id),
+    FOREIGN KEY (car_id) REFERENCES car(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE
+);
 
-INSERT INTO CAR_PHOTO_GALLERY (car_id, photo_gallery)
-VALUES (1, 'audi-q5.png');
+-- Tabla RENTAL
+CREATE TABLE rental (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    car_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'CONFIRMED', 'ACTIVE', 'COMPLETED', 'CANCELLED')),
+    payment_status VARCHAR(20) DEFAULT 'PENDING' CHECK (payment_status IN ('PENDING', 'PAID', 'REFUNDED', 'PARTIALLY_REFUNDED')),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (car_id) REFERENCES car(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT chk_dates CHECK (end_date > start_date)
+);
+
+-- Tabla FAVORITES
+CREATE TABLE favorite (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    car_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (car_id) REFERENCES car(id) ON DELETE CASCADE,
+    CONSTRAINT unique_favorite UNIQUE (user_id, car_id)  -- Sintaxis correcta para H2
+);
+
+-- Índices para mejorar el rendimiento
+CREATE INDEX idx_rental_user ON rental(user_id);
+CREATE INDEX idx_rental_car ON rental(car_id);
+CREATE INDEX idx_rental_dates ON rental(start_date, end_date);
+CREATE INDEX idx_rental_status ON rental(status);
+
+-- Datos tabla category
+INSERT INTO category (title, description, image_url) VALUES
+('Sedán', 'Vehículo de cuatro puertas con maletero separado', 'audi-a1-sportback.png'),
+('Hatchback', 'Vehículo compacto con portón trasero', 'audi-q5.png'),
+('SUV', 'Vehículo utilitario deportivo', 'bmw-x1.png'),
+('Coupé', 'Vehículo de dos puertas y diseño deportivo', 'bmw-x5.png'),
+('Pickup', 'Vehículo con área de carga descubierta', 'audi-a1-sportback.png'),
+('Familiar', 'Vehículo espacioso para familias', 'audi-q5.png'),
+('Convertible', 'Vehículo con techo retráctil', 'bmw-x1.png'),
+('Minivan', 'Vehículo familiar de gran capacidad', 'bmw-x5.png'),
+('Eléctricos', 'Vehículo totalmente eléctrico', 'audi-a1-sportback.png'),
+('Híbridos', 'Vehículo con motor híbrido', 'audi-q5.png'),
+('Deportivos', 'Vehículos de alto rendimiento', 'bmw-x1.png'),
+('Lujo', 'Vehículos premium y de alta gama', 'bmw-x5.png');
+
+-- Datos tabla feature
+INSERT INTO feature (name, icon) VALUES
+('Aire acondicionado', 'fa fa-snowflake-o'),
+('Sensores de estacionamiento', 'fa fa-exclamation'),
+('Cámara de reversa', 'fa fa-camera'),
+('Control crucero', 'fa fa-dot-circle-o'),
+('Bluetooth', 'fa fa-bluetooth'),
+('Navegación GPS', 'fa fa-map-o'),
+('Control de temperatura', 'fa fa-thermometer-empty'),
+('Techo solar', 'fa fa-sun-o'),
+('Sistema de sonido premium', 'fa fa-volume-up'),
+('CarPlay/Android Auto', 'fa fa-mobile');
+
+-- Datos tabla car
+INSERT INTO car (model, transmission, daily_rental_cost, description, main_photo_url, is_available) VALUES
+('Peugeot 208', 'Manual', 85.00, 'El Peugeot 208 es un sedán versátil con diseño moderno y tecnología avanzada. Ofrece un interior cómodo, motor eficiente y gran maniobrabilidad. Su sistema de seguridad y conectividad lo hacen ideal para viajes urbanos y largos. Un coche confiable con excelente relación calidad-precio.', 'peugeot-208.png', true),
+('Peugeot 308', 'Automático', 110.00, 'El Peugeot 308 combina diseño elegante con tecnología de vanguardia. Su conducción es precisa y eficiente, gracias a su motorización optimizada. Dispone de un habitáculo espacioso y bien equipado. Ideal para quienes buscan un coche compacto sin renunciar al confort y la seguridad avanzada.', 'peugeot-308.png', true),
+('Peugeot 2008', 'Manual', 95.00, 'El Peugeot 2008 es un SUV urbano con un diseño robusto y dinámico. Su habitáculo es espacioso y cuenta con tecnología avanzada. Equipado con sistemas de seguridad y asistencia, ofrece una conducción cómoda y segura. Ideal para quienes buscan un vehículo versátil y moderno.', 'peugeot-2008.png', true),
+('Audi A1 Sportback', 'Manual', 100.00, 'El Audi A1 Sportback es un compacto premium con un diseño juvenil y deportivo. Ofrece un interior de alta calidad, tecnología avanzada y motores eficientes. Su conducción es ágil y segura, ideal para la ciudad. Destaca por su conectividad y sistemas de asistencia innovadores.', 'audi-a1-sportback.png', true),
+('Peugeot Rifter', 'Manual', 90.00, 'El Peugeot Rifter es un SUV espacioso y funcional, ideal para familias y aventureros. Su diseño robusto y su equipamiento tecnológico garantizan comodidad y seguridad. Ofrece gran capacidad de carga y versatilidad en el uso diario, con motores eficientes y asistencias avanzadas.', 'peugeot-rifter.png', true),
+('Peugeot 3008', 'Automático', 130.00, 'El Peugeot 3008 es un SUV sofisticado con un diseño innovador. Su interior tecnológico y espacioso ofrece confort y conectividad avanzada. Conducción ágil y eficiente con asistencia inteligente. Un vehículo que combina estilo, seguridad y rendimiento para experiencias de viaje inolvidables.', 'peugeot-3008.png', true),
+('Peugeot 208-II', 'Manual', 85.00, 'El Peugeot 208 es un sedán versátil con diseño moderno y tecnología avanzada. Ofrece un interior cómodo, motor eficiente y gran maniobrabilidad. Su sistema de seguridad y conectividad lo hacen ideal para viajes urbanos y largos. Un coche confiable con excelente relación calidad-precio.', 'peugeot-208.png', true),
+('Peugeot 308-II', 'Automático', 110.00, 'El Peugeot 308 combina diseño elegante con tecnología de vanguardia. Su conducción es precisa y eficiente, gracias a su motorización optimizada. Dispone de un habitáculo espacioso y bien equipado. Ideal para quienes buscan un coche compacto sin renunciar al confort y la seguridad avanzada.', 'peugeot-308.png', true),
+('Peugeot 2008-II', 'Manual', 95.00, 'El Peugeot 2008 es un SUV urbano con un diseño robusto y dinámico. Su habitáculo es espacioso y cuenta con tecnología avanzada. Equipado con sistemas de seguridad y asistencia, ofrece una conducción cómoda y segura. Ideal para quienes buscan un vehículo versátil y moderno.', 'peugeot-2008.png', true),
+('Audi A1 Sportback-II', 'Manual', 100.00, 'El Audi A1 Sportback es un compacto premium con un diseño juvenil y deportivo. Ofrece un interior de alta calidad, tecnología avanzada y motores eficientes. Su conducción es ágil y segura, ideal para la ciudad. Destaca por su conectividad y sistemas de asistencia innovadores.', 'audi-a1-sportback.png', true),
+('Peugeot Rifter-II', 'Manual', 90.00, 'El Peugeot Rifter es un SUV espacioso y funcional, ideal para familias y aventureros. Su diseño robusto y su equipamiento tecnológico garantizan comodidad y seguridad. Ofrece gran capacidad de carga y versatilidad en el uso diario, con motores eficientes y asistencias avanzadas.', 'peugeot-rifter.png', true),
+('Peugeot 3008-II', 'Automático', 130.00, 'El Peugeot 3008 es un SUV sofisticado con un diseño innovador. Su interior tecnológico y espacioso ofrece confort y conectividad avanzada. Conducción ágil y eficiente con asistencia inteligente. Un vehículo que combina estilo, seguridad y rendimiento para experiencias de viaje inolvidables.', 'peugeot-3008.png', false);
+
+-- Datos tabla car_photo_gallery
+INSERT INTO car_photo_gallery (car_id, photo_url) VALUES
+(2, 'audi-q5.png'),
+(2, 'bmw-x1.png'),
+(2, 'bmw-x5.png'),
+(2, 'bmw-serie-1.png'),
+(2, 'bmw-serie-3.png'),
+(2, 'audi-a5-sportback.png'),
+(2, 'audi-a1-sportback.png'),
+(2, 'bmx-serie-3-touring.png'),
+(2, 'peugeot-rifter.png');
 
 
+-- Datos tabla car_categories
+INSERT INTO car_categories (car_id, category_id) VALUES
+(1, 1), (1, 9),
+(2, 2), (2, 10),
+(3, 3), (3, 11),
+(4, 4), (4, 12),
+(5, 5), (5, 1),
+(6, 6), (6, 2),
+(7, 7), (7, 3),
+(8, 8), (8, 4),
+(9, 9), (9, 5),
+(10, 10), (10, 6),
+(11, 11), (11, 7),
+(12, 12), (12, 8);
 
+
+-- Datos tabla car_features
+INSERT INTO car_features (car_id, feature_id) VALUES
+(1, 1), (1, 3), (1, 5),
+(2, 1), (2, 2), (2, 4), (2, 6),
+(3, 1), (3, 3), (3, 7), (3, 9),
+(4, 1), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6), (4, 7), (4, 8), (4, 9), (4, 10),
+(5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (5, 6), (5, 7), (5, 8), (5, 9), (5, 10);
+
+-- Datos tabla users
+INSERT INTO users (first_name, last_name, email, password, is_admin) VALUES
+('Emma', 'Arellan', 'emma@emma.com', '$2a$10$oA5/s9vEVceELsryS3xx0eBWVWKj297fm0yqQUnpREoFq9jEndNoC', FALSE),
+('Harry', 'Arellan', 'harry@harry.com', '$2a$10$oA5/s9vEVceELsryS3xx0eBWVWKj297fm0yqQUnpREoFq9jEndNoC', FALSE),
+('admin', 'user', 'admin@admin.com', '$2a$10$oA5/s9vEVceELsryS3xx0eBWVWKj297fm0yqQUnpREoFq9jEndNoC', TRUE);
+
+-- Datos tabla rental
+INSERT INTO rental (car_id, user_id, start_date, end_date, total_price, status) VALUES
+(1, 1, DATEADD('DAY', 1, CURRENT_DATE), DATEADD('DAY', 3, CURRENT_DATE), 170.00, 'CANCELLED'),
+(2, 2, DATEADD('DAY', 5, CURRENT_DATE), DATEADD('DAY', 7, CURRENT_DATE), 220.00, 'CANCELLED'),
+(3, 1, CURRENT_DATE, DATEADD('DAY', 2, CURRENT_DATE), 190.00, 'CANCELLED'),
+(4, 2, DATEADD('DAY', -10, CURRENT_DATE), DATEADD('DAY', -7, CURRENT_DATE), 300.00, 'CANCELLED'),
+(5, 1, DATEADD('DAY', -15, CURRENT_DATE), DATEADD('DAY', -10, CURRENT_DATE), 450.00, 'CANCELLED'),
+(6, 2, DATEADD('DAY', -5, CURRENT_DATE), DATEADD('DAY', -3, CURRENT_DATE), 260.00, 'CANCELLED'),
+(7, 1, DATEADD('DAY', 10, CURRENT_DATE), DATEADD('DAY', 12, CURRENT_DATE), 170.00, 'CANCELLED'),
+(8, 2, DATEADD('DAY', 15, CURRENT_DATE), DATEADD('DAY', 18, CURRENT_DATE), 330.00, 'CANCELLED'),
+(9, 1, DATEADD('DAY', -3, CURRENT_DATE), DATEADD('DAY', -1, CURRENT_DATE), 190.00, 'CANCELLED'),
+(10, 2, DATEADD('DAY', -20, CURRENT_DATE), DATEADD('DAY', -15, CURRENT_DATE), 500.00, 'CANCELLED'),
+(11, 1, DATEADD('DAY', 20, CURRENT_DATE), DATEADD('DAY', 25, CURRENT_DATE), 450.00, 'CANCELLED'),
+(12, 2, CURRENT_DATE, DATEADD('DAY', 5, CURRENT_DATE), 650.00, 'CONFIRMED');
+
+-- Data favorite
+INSERT INTO favorite (user_id, car_id, created_at) VALUES
+(1, 3, CURRENT_TIMESTAMP),  -- Usuario 1 marca como favorito el coche 3
+(1, 5, CURRENT_TIMESTAMP),  -- Usuario 1 marca como favorito el coche 5
+(2, 1, CURRENT_TIMESTAMP),-- Usuario 2 marca como favorito el coche 1
+(2, 3,CURRENT_TIMESTAMP),
+(3, 10, CURRENT_TIMESTAMP),
+(3, 4, CURRENT_TIMESTAMP);  -- Admin marca como favorito el coche 4
